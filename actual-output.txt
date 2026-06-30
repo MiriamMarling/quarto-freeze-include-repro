@@ -1,0 +1,14 @@
+ACTUAL (Quarto 1.9.37)
+
+After editing the included _body.qmd from MARKER-ALPHA to MARKER-BETA and
+re-rendering with execute.freeze: auto:
+
+  type: default     (control)   ->  MARKER-BETA    PASS (exit 0)   re-renders correctly
+  type: manuscript               ->  MARKER-ALPHA   FAIL (exit 1)   STALE — bug
+
+The manuscript article reuses its frozen output despite the included file change.
+Recovery requires deleting _freeze (touch index.qmd does NOT help).
+
+Verbatim from the scripts:
+  repro-default.sh    -> "PASS: include change picked up (MARKER-BETA) in default project."   exit 0
+  repro-manuscript.sh -> "FAIL (bug present): still MARKER-ALPHA after editing the include"    exit 1

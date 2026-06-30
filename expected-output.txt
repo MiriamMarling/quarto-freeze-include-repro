@@ -1,0 +1,10 @@
+EXPECTED (correct Quarto behavior)
+
+After editing the included _body.qmd from MARKER-ALPHA to MARKER-BETA and
+re-rendering with execute.freeze: auto, the rendered output contains MARKER-BETA.
+
+  type: default     (control)   ->  MARKER-BETA   PASS (exit 0)
+  type: manuscript               ->  MARKER-BETA   PASS (exit 0)
+
+Editing an included file should invalidate the article's freeze entry in both
+project types.
