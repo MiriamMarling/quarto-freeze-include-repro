@@ -2,9 +2,17 @@
 
 Minimal, self-contained reproduction for a Quarto `freeze: auto` correctness bug.
 
-[![repro](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/repro.yml/badge.svg)](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/repro.yml)
+## Status by Quarto version
 
-> This badge is **red while the bug is present**, by design. See [Reading the CI](#reading-the-ci).
+Each version runs on every push and every Monday. A **red badge means the bug
+still reproduces** on that version; green means it no longer does, and when a
+version first turns green an issue is opened here as a heads-up.
+
+| Quarto version | Repro |
+|---|---|
+| `release` (current stable) | [![release](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/release.yml/badge.svg)](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/release.yml) |
+| `pre-release` (development build) | [![pre-release](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/pre-release.yml/badge.svg)](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/pre-release.yml) |
+| `1.9.37` (originally reported) | [![quarto-1.9.37](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/pinned.yml/badge.svg)](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/pinned.yml) |
 
 **Summary.** In a `type: manuscript` project whose article `{{< include >}}`s
 another `.qmd`, `execute.freeze: auto` does **not** invalidate the article's
@@ -26,16 +34,25 @@ Likely a manuscript-specific variant of
 | `repro-default.sh` | **Control**: `type: default` re-renders correctly, exits **0** |
 | `expected-output.txt` | What a correct Quarto should produce |
 | `actual-output.txt` | What Quarto 1.9.37 actually produces |
-| `.github/workflows/repro.yml` | Runs both on `ubuntu-latest` |
+| `.github/workflows/repro.yml` | Reusable job: runs the control and bug scripts for one Quarto version |
+| `.github/workflows/release.yml`, `pre-release.yml`, `pinned.yml` | Call the reusable job on `release`, `pre-release`, and `1.9.37` |
 
 Each script writes its own tiny project to a temp dir, renders twice, and greps a
 marker. Nothing else in this repo is touched.
 
 ## Reading the CI
 
-The workflow runs the **control** (expected green) and the **bug** case (expected
-**red while the bug exists**). So a **red badge means the bug is still present**;
-when Quarto fixes it, the bug job turns green. It doubles as a regression test.
+Three workflows run the same reproduction, one per Quarto version (`release`,
+`pre-release`, and the originally reported `1.9.37`), on every push and every
+Monday at 12:00 UTC. Each runs the **control** (expected green) and the **bug**
+case (expected **red while the bug exists**), so a **red badge means the bug is
+still present on that version**; the day Quarto fixes it, that version's badge
+turns green and an issue is opened here (assigned to the repo owner) as a
+notification.
+
+Testing `pre-release` shows whether a fix has already landed on Quarto's
+development branch. As of 2026-07-01 all three fail, so the bug is present on the
+current release and the development build, not only on `1.9.37`.
 
 A failing run looks like this (the script's own markers; the verbose render
 output is omitted):
@@ -48,7 +65,7 @@ freeze: auto did not invalidate on the included-file change.
 ```
 
 Live runs:
-<https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/repro.yml>
+<https://github.com/MiriamMarling/quarto-freeze-include-repro/actions>
 
 ## Run locally
 
@@ -80,8 +97,9 @@ Requires `quarto` on `PATH` and the knitr (R) engine (`knitr`, `rmarkdown`).
 
 ## Tested on
 
-Quarto **1.9.37**, Pandoc **3.8.3**, R **4.6.0** / knitr **1.51**, macOS Tahoe **26.5.1** arm64;
-also runs in CI on `ubuntu-latest` (see the workflow).
+Locally: Quarto **1.9.37**, Pandoc **3.8.3**, R **4.6.0** / knitr **1.51**, macOS
+Tahoe **26.5.1** arm64. In CI on `ubuntu-latest`: Quarto **release**,
+**pre-release**, and **1.9.37**, on every push and weekly (see the badges above).
 
 ## License
 
