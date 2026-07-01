@@ -6,13 +6,18 @@ on:
 jobs:
   freeze-include-repro:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        quarto: [release, pre-release, 1.9.37]
+    name: freeze-include-repro (quarto ${{ matrix.quarto }})
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
         with:
-          version: 1.9.37
+          version: ${{ matrix.quarto }}
 
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
@@ -23,11 +28,11 @@ jobs:
         run: Rscript -e 'install.packages(c("knitr", "rmarkdown"))'
 
       # Control: a default project re-renders on the include change. Expected PASS.
-      - name: Control (type default) — should re-render on include change
+      - name: Control (type default) re-renders on include change
         run: bash repro-default.sh
 
-      # Bug: the manuscript article goes stale. Expected FAIL while the bug exists,
-      # which is the point — a red badge means the bug is still present, and this
-      # job turns green the day Quarto fixes it.
-      - name: Bug (type manuscript) — stale freeze on include change
+      # Bug: the manuscript article goes stale. Expected FAIL while the bug exists.
+      # A red badge means the bug is still present; this job turns green the day
+      # Quarto fixes it.
+      - name: Bug (type manuscript) goes stale on include change
         run: bash repro-manuscript.sh
