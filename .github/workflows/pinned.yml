@@ -1,0 +1,16 @@
+name: quarto-1.9.37
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 12 * * 1'   # Mondays 12:00 UTC
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  repro:
+    uses: ./.github/workflows/repro.yml
+    with:
+      quarto: 1.9.37

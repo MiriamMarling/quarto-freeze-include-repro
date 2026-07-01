@@ -1,23 +1,22 @@
 name: repro
 on:
-  push:
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      quarto:
+        description: Quarto version to test (release, pre-release, or a pinned version).
+        required: true
+        type: string
 
 jobs:
   freeze-include-repro:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        quarto: [release, pre-release, 1.9.37]
-    name: freeze-include-repro (quarto ${{ matrix.quarto }})
     steps:
       - uses: actions/checkout@v4
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
         with:
-          version: ${{ matrix.quarto }}
+          version: ${{ inputs.quarto }}
 
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
@@ -32,7 +31,52 @@ jobs:
         run: bash repro-default.sh
 
       # Bug: the manuscript article goes stale. Expected FAIL while the bug exists.
-      # A red badge means the bug is still present; this job turns green the day
-      # Quarto fixes it.
+      # A red badge means the bug is still present; it turns green the day Quarto
+      # fixes it, at which point notify-if-fixed opens an issue as a heads-up.
       - name: Bug (type manuscript) goes stale on include change
         run: bash repro-manuscript.sh
+
+  # Runs only when the bug check above passed, which by construction means the bug
+  # no longer reproduces on this Quarto version. Opens one issue (assigned to the
+  # repo owner, so GitHub emails it) and skips if that notice issue is already open.
+  # continue-on-error keeps a green badge green even if issue creation hiccups.
+  notify-if-fixed:
+    needs: freeze-include-repro
+    if: ${{ needs.freeze-include-repro.result == 'success' }}
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/github-script@v7
+        env:
+          QUARTO_VERSION: ${{ inputs.quarto }}
+        with:
+          script: |
+            const version = process.env.QUARTO_VERSION;
+            const title = `freeze/include bug no longer reproduces on Quarto ${version}`;
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100,
+            });
+            if (open.some(i => i.title === title)) {
+              core.info('Notice issue already open; skipping.');
+              return;
+            }
+            const run = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title,
+              assignees: [context.repo.owner],
+              body: [
+                `Automated CI status: the reproduction passed on Quarto \`${version}\`,`,
+                `so the freeze/include bug no longer reproduces on that version.`,
+                ``,
+                `Run: ${run}`,
+                ``,
+                `Verify by hand, then follow up on quarto-dev/quarto-cli#6793.`,
+              ].join('\n'),
+            });
