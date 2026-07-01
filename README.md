@@ -37,7 +37,7 @@ when Quarto fixes it, the bug job turns green. It doubles as a regression test.
 
 ```bash
 bash repro-default.sh     # control: prints PASS, exit 0
-bash repro-manuscript.sh  # bug:     prints FAIL (bug present), exit 1
+bash repro-manuscript.sh  # bug: prints FAIL (bug present), exit 1
 ```
 
 Requires `quarto` on `PATH` and the knitr (R) engine (`knitr`, `rmarkdown`).
