@@ -2,6 +2,10 @@
 
 Minimal, self-contained reproduction for a Quarto `freeze: auto` correctness bug.
 
+[![repro](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/repro.yml/badge.svg)](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/repro.yml)
+
+> This badge is **red while the bug is present**, by design. See [Reading the CI](#reading-the-ci).
+
 **Summary.** In a `type: manuscript` project whose article `{{< include >}}`s
 another `.qmd`, `execute.freeze: auto` does **not** invalidate the article's
 frozen output when the *included* file changes. The render keeps showing the old
@@ -33,7 +37,30 @@ The workflow runs the **control** (expected green) and the **bug** case (expecte
 **red while the bug exists**). So a **red badge means the bug is still present**;
 when Quarto fixes it, the bug job turns green. It doubles as a regression test.
 
+A failing run looks like this (the script's own markers; the verbose render
+output is omitted):
+
+```
+render 1: MARKER-ALPHA present (ok)
+...
+FAIL (bug present): still MARKER-ALPHA after editing the include
+freeze: auto did not invalidate on the included-file change.
+```
+
+Live runs:
+<https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/repro.yml>
+
 ## Run locally
+
+From a fresh clone to the failing exit code in three lines:
+
+```bash
+git clone https://github.com/MiriamMarling/quarto-freeze-include-repro
+cd quarto-freeze-include-repro
+bash repro-manuscript.sh   # exits 1 while the bug is present
+```
+
+Both scripts, run directly:
 
 ```bash
 bash repro-default.sh     # control: prints PASS, exit 0
@@ -55,6 +82,11 @@ Requires `quarto` on `PATH` and the knitr (R) engine (`knitr`, `rmarkdown`).
 
 Quarto **1.9.37**, Pandoc **3.8.3**, R **4.6.0** / knitr **1.51**, macOS Tahoe **26.5.1** arm64;
 also runs in CI on `ubuntu-latest` (see the workflow).
+
+## License
+
+Released into the public domain under [The Unlicense](LICENSE); copy the scripts
+into a test suite freely, no attribution required.
 
 ## Author and review
 
