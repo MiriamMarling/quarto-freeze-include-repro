@@ -10,9 +10,9 @@ version first turns green an issue is opened here as a heads-up.
 
 | Quarto version | Repro |
 |---|---|
-| `release` (current stable) | [![release](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/release.yml/badge.svg)](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/release.yml) |
-| `pre-release` (development build) | [![pre-release](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/pre-release.yml/badge.svg)](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/pre-release.yml) |
-| `1.9.37` (originally reported) | [![quarto-1.9.37](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/pinned.yml/badge.svg)](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/pinned.yml) |
+| `release` (current stable) | [![Quarto release](https://img.shields.io/github/actions/workflow/status/MiriamMarling/quarto-freeze-include-repro/release.yml?branch=main&label=Quarto%20release)](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/release.yml) |
+| `pre-release` (development build) | [![Quarto pre-release](https://img.shields.io/github/actions/workflow/status/MiriamMarling/quarto-freeze-include-repro/pre-release.yml?branch=main&label=Quarto%20pre-release)](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/pre-release.yml) |
+| `1.9.37` (originally reported) | [![Quarto 1.9.37](https://img.shields.io/github/actions/workflow/status/MiriamMarling/quarto-freeze-include-repro/pinned.yml?branch=main&label=Quarto%201.9.37)](https://github.com/MiriamMarling/quarto-freeze-include-repro/actions/workflows/pinned.yml) |
 
 **Summary.** In a `type: manuscript` project whose article `{{< include >}}`s
 another `.qmd`, `execute.freeze: auto` does **not** invalidate the article's
